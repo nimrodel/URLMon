@@ -1,0 +1,115 @@
+body
+{
+	margin: 0;
+	padding: 0;
+	background: url('../images/background.png');
+}
+
+a
+{
+	display: block;
+	text-decoration: none;
+	color: black;
+}
+
+img
+{
+	border: 0px;
+}
+
+table
+{
+	width: 100%;
+	padding: 0px;
+	margin: 0px;
+	border: 0px;
+	border-collapse: separate;
+}
+
+input
+{
+	padding: 0px;
+	margin: 0px;
+}
+
+.invisible
+{
+	display: none;
+}
+
+/************ MENU ************/
+
+div.menu
+{
+	background: url('../images/background.png') #365D95;
+	font-weight: bold;
+	color: #FFFFFF;
+	border-bottom: solid 5px #4F8DDD;
+}
+
+div.menu a
+{
+	display: inline-block;
+	background: #4272B5;
+	width: 100px;
+	margin: 5px 0px 0px 5px;
+	padding: 2px;
+	text-align: center;
+	color: #FFFFFF;
+}
+
+div.menu a.selected
+{
+	background: #4F8DDD;
+}
+
+
+
+
+
+table.list
+{
+	width: 800px;
+	margin: 10px;
+	border-collapse: separate;
+}
+
+table.list tr td
+{
+	padding: 3px;
+}
+
+table.list tr.header
+{
+	background: #4F8DDD;
+	color: #FFFFFF;
+}
+
+table.list tr.mainline,
+table.list tr.detailline
+{
+	background: url('../images/transperent.png');
+}
+
+table.list tr.detailline td a.group
+{
+	padding: 2px;
+}
+
+
+table.grouplist tr
+{
+	background: url('../images/transperent.png');
+	padding: 10px;
+}
+
+input[type=button]
+{
+	width: 100px;
+}
+
+input[type="text"]
+{
+	width: 400px;
+}
+
