@@ -1,10 +1,13 @@
 use strict;
 use DBI;
+use Cwd;
 use LWP::Simple;
 use DateTime;
 
 use threads;
 use threads::shared;
+
+use Proc::Daemon;
 
 sub ReadConf;
 sub InitURLHash;
@@ -18,15 +21,19 @@ sub SendMailToSubscribers;
 sub CheckMsgQueue;
 sub Run;
 
+####################################### Daemonize #########################################
+my $path = getcwd;
+print "going DAEMON...\n";
+Proc::Daemon::Init( { work_dir=>$path } );
 
-######################################## Main ########################################
+# Perform initializes here
 
 #shared queue: Main thread will push messages, SendMail thread will shift;
 my @msg_queue;
 share(@msg_queue);
 
 my ($database, $user, $pass ) = ReadConf;
-
+print "$database, $user, $pass \n";
 my $dsn = "dbi:mysql:$database:localhost:3306";
 my $dbh = DBI->connect( $dsn,
 						$user,                          # user
@@ -40,29 +47,24 @@ my $sth_getlastlogs = $dbh->prepare("SELECT DISTINCT url_id, dt, status FROM log
 my $sth_updatelogs = $dbh->prepare("INSERT INTO logs values (?, ?, ?);");
 my $sth_updateurlstate = $dbh->prepare("UPDATE urls SET l_checked=? WHERE id=?");
 
-#RUN:
+####################################### MAIN #########################################
+
 Run();
 
 ######################################################################################
 
 sub ReadConf
 {
-	open(CONF, "<", "../etc/db.conf") or die "Could not open file '../etc/db.conf': $!";
-	my ($database, $user, $pass, $mailconf );
-	while(<CONF>)
+	open(CONF, "<", "../etc/urlmon.cfg") or die "Could not open file '../etc/urlmon.cfg': $!";
+	my ($database, $user, $pass);
+	while( <CONF> )
 	{
-		if( $_ =~ m/^dbname=.*/)
-		{
-		$database = substr($_, 7, -1); #print $database."\n";
-		}
-		elsif( $_ =~ m/^user=.*/)
-		{
-			$user = substr($_, 5, -1); #print $user."\n";
-		}
-		elsif( $_ =~ m/^pass=.*/)
-		{
-			$pass = substr($_, 5, -1);  #print $pass."\n";
-		}
+		chomp;
+		my @row = split( '=', $_ );
+
+		$database = $row[1] if $row[0] eq "dbname";
+		$user = $row[1] if $row[0] eq "user";
+		$pass = $row[1] if $row[0] eq "pass";
 	}
 	close(CONF);
 	return ($database, $user, $pass );
@@ -84,7 +86,7 @@ sub GetCurrentDatetime
 
 sub CheckURLState
 {
-	my $url = @_[0];
+	my $url = shift;
 	1 if (head($url)) or 0;
 }
 
@@ -153,7 +155,6 @@ sub PrepareMail
 	}
 	
 	my $from = "notification\@urlmon";
-	my $to = "gabriela.tzanova\@gmail.com";
 	my $subject = "URL Monitor Notification: Status update";
 	my $message = "Hello, \n
 You have subscribed to receive a notification when the server at '$url' goes $strsubscr.\n
@@ -179,9 +180,8 @@ sub SendMail
 sub Run
 {
 	my %url_to_state = InitURLHash();
-	my $run = 1;
 	my $thr_sendmail = threads->create( \&CheckMsgQueue );
-	while ($run)
+	while (1)
 	{
 		$sth_selectall->execute();
 
@@ -189,8 +189,6 @@ sub Run
 		{
 			(my $id, my $url, my $interval, my $last_checked ) = @row; 
 
-			print("id: $id, url: $url, interval: $interval, last check: $last_checked\n");
-			
 			if( $last_checked == -1 or $last_checked >= $interval )
 			{
 				my $now = GetCurrentDatetime; 
@@ -207,13 +205,9 @@ sub Run
 				}
 			}
 		}
-		$run++;
-		if( $run == 30 )
-		{
-			$run = 0;
-		}
-		#there will be at least 1 second pause between every db check
 		sleep(1);
 	}
+	
 	$thr_sendmail->join;
+	$dbh->disconnect;
 }

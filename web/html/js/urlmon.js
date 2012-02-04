@@ -13,12 +13,148 @@ function ToggleByID(ID)
 		$('#' + ID + 'image').attr('src','../images/plus.png');
 }
 
+function AddURL()
+{
+	$.ajax({
+		url: '?func=add_url&args=' + $('#new_url').attr('value') + '|' + $('#new_interval').attr('value'),
+		success: function( data ) {
+			alert(data);
+			location.reload();
+		},
+		error: function(jqXHR, textStatus) {
+			alert( "Request failed: " + textStatus );
+		}
+	});
+}
+
+function EditURL(ID)
+{
+	var save = !$('#edit_interval_' + ID).hasClass('invisible');
+	if(save)
+	{
+		$.ajax({
+			url: '?func=set_interval&args=' + ID + '|' + $("#edit_interval_" + ID).attr('value'),
+			success: function( data ) {
+				alert(data);
+				location.reload();
+			},
+			error: function(jqXHR, textStatus) {
+				alert( "Request failed: " + textStatus );
+			}
+		});
+	}
+	$('#span_interval_' + ID).toggleClass('invisible');
+	$('#edit_interval_' + ID).toggleClass('invisible');
+	$('#edit_button_' + ID).attr('value', save ? 'Edit' : 'Save');
+}
+
+function RemoveURL(ID)
+{
+	$.ajax({
+		url: '?func=remove_url&args=' + ID,
+		success: function( data ) {
+			alert(data);
+			location.reload();
+		},
+		error: function(jqXHR, textStatus) {
+			alert( "Request failed: " + textStatus );
+		}
+	});
+}
+
 function AddGroup(url_id)
 {
 	$.ajax({
 		url: '?func=add_group&args=' + url_id + '|' + $("#new_group_" + url_id).attr('value'),
 		success: function( data ) {
 			alert(data);
+			if(location.search == '')
+				location.search = '?urls=' + url_id
+			else
+			{
+				var re=/urls=[0-9]*/
+				location.search = location.search.replace(re, 'urls=' + url_id);
+			}
+		},
+		error: function(jqXHR, textStatus) {
+			alert( "Request failed: " + textStatus );
+		}
+	});
+}
+
+function RemoveGroup(url_id, group)
+{
+	$.ajax({
+		url: '?func=remove_group&args=' + url_id + '|' + group,
+		success: function( data ) {
+			alert(data);
+			if(location.search == '')
+				location.search = '?urls=' + url_id
+			else
+			{
+				var re=/urls=[0-9]*/
+				location.search = location.search.replace(re, 'urls=' + url_id);
+			}
+		},
+		error: function(jqXHR, textStatus) {
+			alert( "Request failed: " + textStatus );
+		}
+	});
+}
+
+function AddNotification(url_id)
+{
+	$.ajax({
+		url: '?func=add_notification&args=' + url_id + '|' + $("#new_notif_mail_" + url_id).attr('value') + '|' + $("#new_notif_type_" + url_id)[0].selectedIndex,
+		success: function( data ) {
+			alert(data);
+			if(location.search == '')
+				location.search = '?urls=' + url_id
+			else
+			{
+				var re=/urls=[0-9]*/
+				location.search = location.search.replace(re, 'urls=' + url_id);
+			}
+		},
+		error: function(jqXHR, textStatus) {
+			alert( "Request failed: " + textStatus );
+		}
+	});
+}
+
+function EditNotification(url_id, notif_id, email)
+{
+	var save = !$('#notif_' + url_id + '_type_' + notif_id)[0].disabled;
+	if(save)
+	{
+		$.ajax({
+			url: '?func=set_notif_type&args=' + url_id + '|' + email + '|' + $('#notif_' + url_id + '_type_' + notif_id)[0].selectedIndex,
+			success: function( data ) {
+				alert(data);
+				location.reload();
+			},
+			error: function(jqXHR, textStatus) {
+				alert( "Request failed: " + textStatus );
+			}
+		});
+	}
+	$('#notif_' + url_id + '_type_' + notif_id)[0].disabled = save;
+	//$('#edit_button_' + ID).attr('value', save ? 'Edit' : 'Save');
+}
+
+function RemoveNotification(url_id, mail)
+{
+	$.ajax({
+		url: '?func=remove_notification&args=' + url_id + '|' + mail,
+		success: function( data ) {
+			alert(data);
+			if(location.search == '')
+				location.search = '?urls=' + url_id
+			else
+			{
+				var re=/urls=[0-9]*/
+				location.search = location.search.replace(re, 'urls=' + url_id);
+			}
 		},
 		error: function(jqXHR, textStatus) {
 			alert( "Request failed: " + textStatus );

@@ -1,7 +1,7 @@
 body
 {
-	margin: 0;
-	padding: 0;
+	margin: 0px;
+	padding: 0px;
 	background: url('../images/background.png');
 }
 
@@ -28,10 +28,17 @@ table
 
 input
 {
-	padding: 0px;
-	margin: 0px;
+	border: 1px solid gray;
+	margin: 0;
+    padding: 0;
+    width: 100%;
 }
 
+input[type="text"]
+{
+	border: 0;
+    height: 100%;
+}
 .invisible
 {
 	display: none;
@@ -63,13 +70,9 @@ div.menu a.selected
 	background: #4F8DDD;
 }
 
-
-
-
-
 table.list
 {
-	width: 800px;
+	width: 1000px;
 	margin: 10px;
 	border-collapse: separate;
 }
@@ -77,6 +80,7 @@ table.list
 table.list tr td
 {
 	padding: 3px;
+	vertical-align: top;
 }
 
 table.list tr.header
@@ -85,31 +89,59 @@ table.list tr.header
 	color: #FFFFFF;
 }
 
+table.list tr td.status_na
+{
+	background: #EFD353;
+	color: #FFFFFF;
+	font-weight: bold;
+}
+
+table.list tr td.status_offline
+{
+	background: #FF5C59;
+	color: #FFFFFF;
+	font-weight: bold;
+}
+
+table.list tr td.status_online
+{
+	background: #60EF53;
+	color: #FFFFFF;
+	font-weight: bold;
+}
+
 table.list tr.mainline,
 table.list tr.detailline
 {
 	background: url('../images/transperent.png');
 }
 
-table.list tr.detailline td a.group
-{
-	padding: 2px;
-}
-
-
-table.grouplist tr
+table.sublist tr
 {
 	background: url('../images/transperent.png');
 	padding: 10px;
 }
 
-input[type=button]
+table.sublist tr:hover
 {
-	width: 100px;
+	background: url('../images/transperent.png') #909090;
 }
 
-input[type="text"]
+input[type=button].button_80
 {
-	width: 400px;
+	width: 80px;
 }
 
+input[type=button].button_20
+{
+	width: 19px;
+	margin-left: 1px;
+}
+
+select
+{
+	border: 1px solid gray;
+	margin: 0;
+	padding: 0;
+	width: 100%;
+}
